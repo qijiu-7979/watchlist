@@ -29,6 +29,9 @@ tbody tr.main.open td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .pos{color:var(--up);font-weight:600}.neg{color:var(--down);font-weight:600}.flat{color:var(--muted)}
 .badge{display:inline-block;font-size:11px;border-radius:6px;padding:3px 9px;background:var(--accent-soft);color:var(--accent);border:1px solid #e0e3fd}
 .badge.exit{background:var(--up-bg);color:var(--up);border-color:#fecaca}.badge.rev,.badge.live{background:var(--down-bg);color:var(--down);border-color:#bbf7d0}
+.act{display:inline-block;font-size:10.5px;line-height:1.5;border-radius:5px;padding:1px 6px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;margin-top:4px;white-space:nowrap}
+.act.hot{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
+.obs{font-size:11.5px;color:var(--muted);line-height:1.45}
 .detail-row{background:#fbfcfe}.detail-row>td{padding:0}.detail-box{padding:18px 22px;border-left:3px solid var(--accent);margin:12px 0;background:#fff;border-radius:0 12px 12px 0}
 .detail-meta{font-size:12.5px;color:var(--muted);margin-bottom:4px}.detail-meta b{color:var(--body)}
 .spark-wrap{margin:10px 0 4px}.spark-title{font-size:11px;color:var(--faint);margin-bottom:4px}
@@ -112,21 +115,23 @@ function rowHtml(st){
     <td data-l="入池价" class="num">${fmt(entry)}</td>
     <td data-l="最新/当日"><div class="${cls(lc)}"><span class="num">${fmt(lclose)}</span><div class="cell-sub ${cls(lc)} num">${pct(lc)}</div></div></td>
     <td data-l="入池后累计" class="${cls(cum)} num">${pct(cum)}</td>
+    <td data-l="观察备注"><div class="obs">${st.note||st.auto_note||'—'}</div>${st.action?`<span class="act ${/已破|放量下跌|临界附近/.test(st.action)?'hot':''}">${st.action}</span>`:''}</td>
     <td data-l="状态"><span class="${stCls}">${stTxt}</span></td>
     <td data-l="行情"><a class="link" href="${qx(st.code)}" target="_blank">行情 ↗</a></td></tr>`;
-  let mini=`<div class="detail-box"><div class="detail-meta">临界：<b>${st.critical_desc||'—'}${st.critical_price?'（'+fmt(st.critical_price)+'）':''}</b> · 介入：${st.entry_condition||'—'}</div>`;
+  let mini=`<div class="detail-box"><div class="detail-meta">临界：<b>${st.critical_desc||'—'}${st.critical_price?'（'+fmt(st.critical_price)+'）':''}</b> · 介入：${st.entry_condition||'—'}</div>
+    <div class="detail-meta">观察备注：<b>${st.note||st.auto_note||'—'}</b>${st.action?'　·　建议动作：<b>'+st.action+'</b>':''}</div>`;
   mini+=spark(ds,entry);
   mini+=`<table class="mini"><thead><tr><th>日期</th><th>收盘</th><th>当日</th><th>最低</th><th>累计</th></tr></thead><tbody>`;
   ds.slice().reverse().forEach(d=>{const c=(entry&&d.close)?(d.close/entry-1)*100:null;
     mini+=`<tr><td class="num">${d.date}</td><td class="num">${fmt(d.close)}</td><td class="${cls(d.chg)} num">${pct(d.chg)}</td><td class="num">${fmt(d.low)}</td><td class="${cls(c)} num">${pct(c)}</td></tr>`;});
   mini+='</tbody></table></div>';
-  return h+`<tr class="detail-row hidden" id="d-${st.code}"><td colspan="8">${mini}</td></tr>`;
+  return h+`<tr class="detail-row hidden" id="d-${st.code}"><td colspan="9">${mini}</td></tr>`;
 }
 function toggle(c){$('d-'+c).classList.toggle('hidden');}
 function tbl(list,empty){
   if(!list.length)return `<p class="note">${empty}</p>`;
   const th=(f,t)=>`<th class="sortable ${SORT.field===f?'active':''}" onclick="sortBy('${f}')">${t}<span class="ar">${SORT.field===f?(SORT.dir>0?'▲':'▼'):'⇅'}</span></th>`;
-  return `<table class="resp"><thead><tr><th>标的</th>${th('entry_date','入池日期')}<th>形态/板块</th>${th('entry_price','入池价')}${th('_latest','最新价')}${th('_chg','当日涨跌')}${th('_cum','入池后累计')}<th>状态</th><th>行情</th></tr></thead><tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+  return `<table class="resp"><thead><tr><th>标的</th>${th('entry_date','入池日期')}<th>形态/板块</th>${th('entry_price','入池价')}${th('_latest','最新价')}${th('_chg','当日涨跌')}${th('_cum','入池后累计')}<th>观察备注</th><th>状态</th><th>行情</th></tr></thead><tbody>${list.map(rowHtml).join('')}</tbody></table>`;
 }
 function enrich(st){const ds=dailyOf(st.code),lt=ds.length?ds[ds.length-1]:null;st._latest=lt?lt.close:st.entry_price;st._chg=lt?lt.chg:null;st._cum=(st.entry_price&&st._latest)?(st._latest/st.entry_price-1)*100:null;return st;}
 function hasFilt(){return !!(FILT.kw||FILT.board||FILT.setup||FILT.date);}
