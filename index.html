@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>观察池 · 每日复盘</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--ink:#0f172a;--body:#334155;--muted:#64748b;--faint:#94a3b8;--line:#e9edf3;--line-2:#f1f4f8;
+--accent:#4f46e5;--accent-soft:#eef0fe;--up:#dc2626;--up-bg:#fef2f2;--down:#16a34a;--down-bg:#f0fdf4;
+--radius:16px;--shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.05)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--body);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+.num{font-variant-numeric:tabular-nums}.wrap{max-width:1180px;margin:0 auto;padding:24px 18px 60px}
+.hero{background:linear-gradient(120deg,#0f172a,#1e293b 55%,#2b2a55);color:#fff;border-radius:20px;padding:24px 26px;box-shadow:var(--shadow)}
+.hero h1{margin:0;font-size:22px}.hero .sub{margin:6px 0 0;font-size:12.5px;color:#c3c9e6}
+.kpis{display:flex;gap:26px;margin-top:16px}.kpi b{display:block;font-size:24px;font-weight:700}.kpi span{font-size:11px;color:#b6bedd}
+.sec{display:flex;align-items:center;gap:10px;margin:26px 0 14px}.sec h2{margin:0;font-size:16px;color:var(--ink)}.sec .line{flex:1;height:1px;background:var(--line)}
+.cnt{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:2px 10px;border-radius:20px}
+#alertBar{margin-top:18px}.alert{padding:12px 18px;border-radius:12px;font-size:13.5px;margin-bottom:10px;display:flex;gap:10px;align-items:center;font-weight:500}
+.alert .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.alert.danger{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}.alert.danger .dot{background:#dc2626}
+.alert.warn{background:#fffbeb;color:#b45309;border:1px solid #fde68a}.alert.warn .dot{background:#f59e0b}
+.alert.ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}.alert.ok .dot{background:#16a34a}
+.grid-mkt{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px}
+.mkt-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;box-shadow:var(--shadow)}
+.mkt-card .nm{font-size:12px;color:var(--muted)}.mkt-card .vl{font-size:20px;font-weight:700;margin-top:3px}.mkt-card .sub2{font-size:11.5px;color:var(--faint);margin-top:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.tbl-scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{background:#fafbfd;color:var(--muted);font-size:11.5px;font-weight:600;text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+tbody td{padding:14px 16px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr.main{cursor:pointer}tbody tr.main:hover{background:#f8faff}tbody tr.main.open{background:var(--accent-soft)}
+tbody tr.main.open td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.cell-name{font-weight:600;color:var(--ink)}.cell-sub{color:var(--faint);font-size:11.5px;margin-top:2px}
+.pos{color:var(--up);font-weight:600}.neg{color:var(--down);font-weight:600}.flat{color:var(--muted)}
+.badge{display:inline-block;font-size:11px;border-radius:6px;padding:3px 9px;background:var(--accent-soft);color:var(--accent);border:1px solid #e0e3fd}
+.badge.exit{background:var(--up-bg);color:var(--up);border-color:#fecaca}.badge.rev,.badge.live{background:var(--down-bg);color:var(--down);border-color:#bbf7d0}
+.detail-row{background:#fbfcfe}.detail-row>td{padding:0}.detail-box{padding:18px 22px;border-left:3px solid var(--accent);margin:12px 0;background:#fff;border-radius:0 12px 12px 0}
+.detail-meta{font-size:12.5px;color:var(--muted);margin-bottom:4px}.detail-meta b{color:var(--body)}
+.spark-wrap{margin:10px 0 4px}.spark-title{font-size:11px;color:var(--faint);margin-bottom:4px}
+.mini{width:100%;font-size:12px;margin-top:10px;border-collapse:collapse}.mini th{background:#f8fafc;color:var(--muted);padding:8px 10px}.mini td{padding:7px 10px;border-bottom:1px solid var(--line-2)}
+.link{color:#2563eb;text-decoration:none;font-size:12px}
+.events{background:#fff;border-radius:16px;padding:8px 22px 16px;box-shadow:var(--shadow)}
+.ev{padding:12px 0;border-bottom:1px dashed var(--line);font-size:12.5px}.ev:last-child{border:none}
+.ev-date{font-weight:600;color:var(--ink)}.tag-e{font-size:10.5px;font-weight:600;border-radius:5px;padding:2px 7px;margin-right:8px;color:#fff}
+.t-entry{background:var(--accent)}.t-exit{background:var(--up)}.t-revoke{background:var(--down)}.t-note{background:var(--faint)}
+.note{color:var(--muted);font-size:12.5px;padding:16px 20px}.footer{color:var(--faint);font-size:12px;text-align:center;margin-top:30px;line-height:1.8}
+.hidden{display:none!important}
+.m-list{display:none}
+@media(max-width:760px){
+  table.resp thead{display:none}table.resp,table.resp tbody,table.resp tr,table.resp td{display:block;width:100%}
+  table.resp tr.main{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:6px 2px}
+  table.resp tr.main td{border:none;padding:7px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  table.resp tr.main td:before{content:attr(data-l);color:var(--faint);font-size:11.5px}
+}
+</style></head><body><div class="wrap">
+<header class="hero"><h1>📋 观察池 · 每日复盘</h1>
+<p class="sub">数据更新至 <b id="upd">-</b> · 红涨绿跌 · 只读分享版</p>
+<div class="kpis"><div class="kpi"><b id="nActive" class="num">0</b><span>在池</span></div>
+<div class="kpi"><b id="nExit" class="num">0</b><span>已退出</span></div>
+<div class="kpi"><b id="nDaily" class="num">0</b><span>表现记录</span></div>
+<div class="kpi"><b id="nEvent" class="num">0</b><span>事件</span></div></div></header>
+<div id="alertBar"></div>
+<div class="sec"><h2>行情概览</h2><span class="line"></span><span id="mktDate" style="font-size:12px;color:var(--muted)"></span></div>
+<div class="grid-mkt" id="mktGrid"></div>
+<div class="sec"><h2>在池标的</h2><span class="cnt" id="cActive">0</span><span class="line"></span></div>
+<div class="card tbl-scroll" id="activeTbl"></div>
+<div class="sec"><h2>已退出标的</h2><span class="cnt" id="cExit">0</span><span class="line"></span></div>
+<div class="card tbl-scroll" id="exitTbl"></div>
+<div class="sec"><h2>事件日志</h2><span class="line"></span></div>
+<div class="events" id="events"></div>
+<div class="footer">每日自动生成 · 数据：NeoData · 红涨绿跌 · 仅供学习复盘，不构成投资建议</div>
+</div>
+<script>
+const DATA={"stocks": [{"code": "600380", "name": "健康元", "board": "化学制药", "setup": "老鸭头(鸭颈)", "entry_condition": "MA60上穿MA120且放量，或回踩MA60(9.12)不破", "critical_desc": "跌破MA60(9.12)", "critical_price": 9.12, "entry_date": "2026-11-02", "entry_price": 10.3, "status": "active", "exit": null}, {"code": "000513", "name": "丽珠集团", "board": "化学制药", "setup": "老鸭头(底部)", "entry_condition": "MA60上穿MA120且放量，或回踩MA60(27.56)不破", "critical_desc": "跌破MA60(27.56)", "critical_price": 27.56, "entry_date": "2026-11-02", "entry_price": 29.42, "status": "active", "exit": null}, {"code": "000716", "name": "黑芝麻", "board": "食品·零食", "setup": "三倍量(爆量)", "entry_condition": "等缩量回踩不破爆量日低点后二次放量", "critical_desc": "跌破爆量日最低价", "critical_price": 5.36, "entry_date": "2026-11-02", "entry_price": 5.49, "status": "active", "exit": null}, {"code": "600020", "name": "中原高速", "board": "高速公路", "setup": "三倍量(涨停)", "entry_condition": "次日看是否缩量回踩不破涨停低点", "critical_desc": "跌破爆量日最低价", "critical_price": 4.09, "entry_date": "2026-11-02", "entry_price": 4.32, "status": "active", "exit": null}, {"code": "603587", "name": "地素时尚", "board": "服装家纺·女装", "setup": "三倍量(涨停)", "entry_condition": "次日看是否缩量回踩不破涨停低点", "critical_desc": "跌破爆量日最低价", "critical_price": 13.14, "entry_date": "2026-11-02", "entry_price": 14.19, "status": "active", "exit": null}, {"code": "600211", "name": "西藏药业", "board": "生物制品", "setup": "三倍量(爆量)", "entry_condition": "等缩量回踩企稳后再看二次放量", "critical_desc": "跌破爆量日最低价", "critical_price": 37.0, "entry_date": "2026-11-02", "entry_price": 38.73, "status": "active", "exit": null}, {"code": "603014", "name": "威高血净", "board": "医疗器械·耗材", "setup": "三倍量(爆量)", "entry_condition": "等缩量回踩企稳后再看二次放量", "critical_desc": "跌破爆量日最低价", "critical_price": 31.17, "entry_date": "2026-11-02", "entry_price": 32.11, "status": "active", "exit": null}, {"code": "000897", "name": "津滨发展", "board": "房地产", "setup": "三倍量(爆量)", "entry_condition": "等缩量回踩企稳后再看二次放量", "critical_desc": "跌破爆量日最低价", "critical_price": 1.84, "entry_date": "2026-11-02", "entry_price": 1.86, "status": "active", "exit": null}], "daily": [{"date": "2026-11-02", "code": "000513", "close": 29.42, "chg": 3.16, "low": 28.4}, {"date": "2026-11-03", "code": "000513", "close": 30.01, "chg": 2.01, "low": 29.21}, {"date": "2026-11-02", "code": "000716", "close": 5.49, "chg": 4.77, "low": 5.36}, {"date": "2026-11-03", "code": "000716", "close": 5.3, "chg": -3.46, "low": 5.21}, {"date": "2026-11-02", "code": "000897", "close": 1.86, "chg": 1.09, "low": 1.84}, {"date": "2026-11-03", "code": "000897", "close": 1.95, "chg": 4.84, "low": 1.83}, {"date": "2026-11-02", "code": "600020", "close": 4.32, "chg": 9.92, "low": 4.09}, {"date": "2026-11-03", "code": "600020", "close": 4.32, "chg": 0.0, "low": 4.25}, {"date": "2026-11-02", "code": "600211", "close": 38.73, "chg": 7.26, "low": 37.0}, {"date": "2026-11-03", "code": "600211", "close": 39.03, "chg": 0.77, "low": 38.26}, {"date": "2026-11-02", "code": "600380", "close": 10.3, "chg": 2.49, "low": 10.01}, {"date": "2026-11-03", "code": "600380", "close": 10.27, "chg": -0.29, "low": 10.2}, {"date": "2026-11-02", "code": "603014", "close": 32.11, "chg": 8.41, "low": 31.17}, {"date": "2026-11-03", "code": "603014", "close": 32.61, "chg": 1.56, "low": 31.76}, {"date": "2026-11-02", "code": "603587", "close": 14.19, "chg": 10.0, "low": 13.14}, {"date": "2026-11-03", "code": "603587", "close": 13.67, "chg": -3.66, "low": 13.36}], "events": [{"date": "2026-11-02", "code": "600380", "name": "健康元", "type": "entry", "note": "老鸭头(鸭颈) 入池"}, {"date": "2026-11-02", "code": "000513", "name": "丽珠集团", "type": "entry", "note": "老鸭头(底部) 入池"}, {"date": "2026-11-02", "code": "000716", "name": "黑芝麻", "type": "entry", "note": "三倍量(爆量) 入池"}, {"date": "2026-11-02", "code": "600020", "name": "中原高速", "type": "entry", "note": "三倍量(涨停) 入池"}, {"date": "2026-11-02", "code": "603587", "name": "地素时尚", "type": "entry", "note": "三倍量(涨停) 入池"}, {"date": "2026-11-02", "code": "600211", "name": "西藏药业", "type": "entry", "note": "三倍量(爆量) 入池"}, {"date": "2026-11-02", "code": "603014", "name": "威高血净", "type": "entry", "note": "三倍量(爆量) 入池"}, {"date": "2026-11-02", "code": "000897", "name": "津滨发展", "type": "entry", "note": "三倍量(爆量) 入池"}], "updated": "2026-11-03"},DASH={"market": {"indexes": [{"name": "上证指数", "close": 3589.83, "chg": -1.32, "date": "2026-11-03"}, {"name": "深证成指", "close": 10840.9, "chg": -1.54, "date": "2026-11-03"}, {"name": "创业板指", "close": 2385.14, "chg": -2.99, "date": "2026-11-03"}], "breadth": {"up": 1577, "down": 3825, "limit_up": 48, "limit_down": 14, "up_ratio": 28, "amount": "13,862.44"}}, "alerts": [{"level": "danger", "text": "黑芝麻(000716) 最新 5.3 跌破临界值 5.36：建议退出观察"}]};
+const $=id=>document.getElementById(id);
+function qx(c){return 'https://gu.qq.com/'+(c[0]==='6'?'sh':'sz')+c+'/gp';}
+function cls(v){return v>0?'pos':(v<0?'neg':'flat');}
+function fmt(v,d=2){return v==null?'-':Number(v).toFixed(d);}
+function pct(v){return v==null?'-':(v>0?'+':'')+Number(v).toFixed(2)+'%';}
+function dailyOf(c){return DATA.daily.filter(d=>d.code===c).sort((a,b)=>a.date<b.date?-1:1);}
+function spark(ds,entry){
+  if(!ds.length)return '';
+  const pts=(entry)?[{close:entry}].concat(ds):ds;
+  const vals=pts.map(p=>p.close).filter(v=>v!=null);if(vals.length<2)return '';
+  const w=260,h=46,min=Math.min(...vals),max=Math.max(...vals),rg=(max-min)||1,step=w/(vals.length-1);
+  const up=vals[vals.length-1]>=(entry||vals[0]),color=up?'#dc2626':'#16a34a';
+  let d='';vals.forEach((v,i)=>{const x=(i*step).toFixed(1),y=(h-4-(v-min)/rg*(h-10)).toFixed(1);d+=(i?' L':'M')+x+' '+y;});
+  const lx=((vals.length-1)*step).toFixed(1);
+  return `<div class="spark-wrap"><div class="spark-title">入池后走势（${vals.length} 个交易日）</div><svg width="${w}" height="${h+6}" viewBox="0 0 ${w} ${h+6}" style="max-width:100%"><path d="${d} L${lx} ${h} L0 ${h} Z" fill="${color}" opacity=".12"/><path d="${d}" fill="none" stroke="${color}" stroke-width="1.8"/><circle cx="${lx}" cy="${(h-4-(vals[vals.length-1]-min)/rg*(h-10)).toFixed(1)}" r="3" fill="${color}"/></svg></div>`;
+}
+function rowHtml(st){
+  const ds=dailyOf(st.code),latest=ds.length?ds[ds.length-1]:null;
+  const lc=latest?latest.chg:null,entry=st.entry_price,lclose=latest?latest.close:entry;
+  const cum=(entry&&lclose)?(lclose/entry-1)*100:null,live=st.status==='active';
+  const stTxt=live?'在池':(st.exit&&st.exit.revoked?'已撤回':'已退出');
+  const stCls=live?'badge live':(st.exit&&st.exit.revoked?'badge rev':'badge exit');
+  let h=`<tr class="main" id="r-${st.code}" onclick="toggle('${st.code}')">
+    <td data-l="标的"><div><div class="cell-name">${st.name}</div><div class="cell-sub num">${st.code}</div></div></td>
+    <td data-l="入池日期"><div><span class="num">${st.entry_date}</span><div class="cell-sub">${ds.length} 个交易日</div></div></td>
+    <td data-l="形态/板块"><div><span class="badge">${st.setup||'—'}</span><div class="cell-sub">${st.board||''}</div></div></td>
+    <td data-l="入池价" class="num">${fmt(entry)}</td>
+    <td data-l="最新/当日"><div class="${cls(lc)}"><span class="num">${fmt(lclose)}</span><div class="cell-sub ${cls(lc)} num">${pct(lc)}</div></div></td>
+    <td data-l="入池后累计" class="${cls(cum)} num">${pct(cum)}</td>
+    <td data-l="状态"><span class="${stCls}">${stTxt}</span></td>
+    <td data-l="行情"><a class="link" href="${qx(st.code)}" target="_blank">行情 ↗</a></td></tr>`;
+  let mini=`<div class="detail-box"><div class="detail-meta">临界：<b>${st.critical_desc||'—'}${st.critical_price?'（'+fmt(st.critical_price)+'）':''}</b> · 介入：${st.entry_condition||'—'}</div>`;
+  mini+=spark(ds,entry);
+  mini+=`<table class="mini"><thead><tr><th>日期</th><th>收盘</th><th>当日</th><th>最低</th><th>累计</th></tr></thead><tbody>`;
+  ds.slice().reverse().forEach(d=>{const c=(entry&&d.close)?(d.close/entry-1)*100:null;
+    mini+=`<tr><td class="num">${d.date}</td><td class="num">${fmt(d.close)}</td><td class="${cls(d.chg)} num">${pct(d.chg)}</td><td class="num">${fmt(d.low)}</td><td class="${cls(c)} num">${pct(c)}</td></tr>`;});
+  mini+='</tbody></table></div>';
+  return h+`<tr class="detail-row hidden" id="d-${st.code}"><td colspan="8">${mini}</td></tr>`;
+}
+function toggle(c){$('d-'+c).classList.toggle('hidden');}
+function tbl(list,empty){
+  if(!list.length)return `<p class="note">${empty}</p>`;
+  return `<table class="resp"><thead><tr><th>标的</th><th>入池日期</th><th>形态/板块</th><th>入池价</th><th>最新/当日</th><th>入池后累计</th><th>状态</th><th>行情</th></tr></thead><tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+}
+function render(){
+  const act=DATA.stocks.filter(s=>s.status==='active'),ex=DATA.stocks.filter(s=>s.status!=='active');
+  $('activeTbl').innerHTML=tbl(act,'暂无在池标的');$('exitTbl').innerHTML=tbl(ex,'暂无退出标的');
+  $('nActive').textContent=act.length;$('nExit').textContent=ex.length;$('nDaily').textContent=DATA.daily.length;$('nEvent').textContent=DATA.events.length;
+  $('cActive').textContent=act.length;$('cExit').textContent=ex.length;$('upd').textContent=DATA.updated||'-';
+  $('events').innerHTML=DATA.events.slice().reverse().map(e=>{
+    const t=e.type==='entry'?['t-entry','入池']:e.type==='exit'?['t-exit','退出']:e.type==='revoke'?['t-revoke','撤回']:['t-note','备注'];
+    return `<div class="ev"><span class="tag-e ${t[0]}">${t[1]}</span><span class="ev-date num">${e.date}</span><div>${e.name||''}（${e.code}）· ${e.note||e.reason||''}${e.trigger?(' · 触发：'+e.trigger):''}</div></div>`;}).join('')||'<p class="note">暂无</p>';
+}
+(function(){
+  const m=DASH.market||{},idx=m.indexes||[],b=m.breadth||{};
+  $('alertBar').innerHTML=(DASH.alerts||[]).map(a=>`<div class="alert ${a.level}"><span class="dot"></span><span>${a.text}</span></div>`).join('');
+  let mh=idx.map(i=>`<div class="mkt-card"><div class="nm">${i.name}</div><div class="vl ${cls(i.chg)} num">${fmt(i.close)}</div><div class="sub2 ${cls(i.chg)} num">${pct(i.chg)}</div></div>`).join('');
+  mh+=`<div class="mkt-card"><div class="nm">上涨 / 下跌家数</div><div class="vl num">${b.up??'-'}/${b.down??'-'}</div><div class="sub2">涨停 ${b.limit_up??'-'} · 跌停 ${b.limit_down??'-'}</div></div>`;
+  mh+=`<div class="mkt-card"><div class="nm">上涨占比 / 成交额</div><div class="vl num">${b.up_ratio!=null?b.up_ratio+'%':'-'}</div><div class="sub2 num">${b.amount?b.amount+' 亿':'-'}</div></div>`;
+  $('mktGrid').innerHTML=mh;if(idx.length)$('mktDate').textContent='截至 '+idx[0].date;
+  render();
+})();
+</script></body></html>
