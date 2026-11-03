@@ -53,10 +53,20 @@ th.sortable{cursor:pointer;user-select:none;white-space:nowrap}th.sortable:hover
 th.sortable .ar{font-size:10px;margin-left:3px;opacity:.45}th.sortable.active{color:var(--accent)}th.sortable.active .ar{opacity:1}
 .m-list{display:none}
 @media(max-width:760px){
-  table.resp thead{display:none}table.resp,table.resp tbody,table.resp tr,table.resp td{display:block;width:100%}
-  table.resp tr.main{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;padding:6px 2px}
-  table.resp tr.main td{border:none;padding:7px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-  table.resp tr.main td:before{content:attr(data-l);color:var(--faint);font-size:11.5px}
+  table.resp{display:none!important}
+  .m-list{display:block}
+  .m-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+  .m-top{display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;gap:10px}
+  .m-name{font-size:16px;font-weight:700;color:var(--ink);margin-right:8px}
+  .m-code{font-size:12px;color:var(--faint)}
+  .m-sub{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .m-r{text-align:right;flex:none}.m-r b{font-size:20px}.m-r div{font-size:12px}
+  .m-mid{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .m-cum{font-weight:600;font-size:13px}
+  .m-dim{font-size:11.5px;color:var(--faint)}
+  .m-act{display:flex;align-items:center;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2)}
+  .m-more{margin-left:auto;font-size:12px;color:var(--accent);cursor:pointer;user-select:none}
+  .act{margin-top:0}
 }
 </style></head><body><div class="wrap">
 <header class="hero"><h1>📋 观察池 · 每日复盘</h1>
@@ -128,10 +138,43 @@ function rowHtml(st){
   return h+`<tr class="detail-row hidden" id="d-${st.code}"><td colspan="9">${mini}</td></tr>`;
 }
 function toggle(c){$('d-'+c).classList.toggle('hidden');}
+function detailInner(st,ds,entry){
+  let m=`<div class="detail-box"><div class="detail-meta">临界：<b>${st.critical_desc||'—'}${st.critical_price?'（'+fmt(st.critical_price)+'）':''}</b> · 介入：${st.entry_condition||'—'}</div>
+    <div class="detail-meta">观察备注：<b>${st.note||st.auto_note||'—'}</b>${st.action?'　·　建议动作：<b>'+st.action+'</b>':''}</div>`;
+  m+=spark(ds,entry);
+  m+=`<table class="mini"><thead><tr><th>日期</th><th>收盘</th><th>当日</th><th>最低</th><th>累计</th></tr></thead><tbody>`;
+  ds.slice().reverse().forEach(d=>{const c=(entry&&d.close)?(d.close/entry-1)*100:null;
+    m+=`<tr><td class="num">${d.date}</td><td class="num">${fmt(d.close)}</td><td class="${cls(d.chg)} num">${pct(d.chg)}</td><td class="num">${fmt(d.low)}</td><td class="${cls(c)} num">${pct(c)}</td></tr>`;});
+  return m+'</tbody></table></div>';
+}
+function mCard(st){
+  const ds=dailyOf(st.code),latest=ds.length?ds[ds.length-1]:null;
+  const lc=latest?latest.chg:null,entry=st.entry_price,lclose=latest?latest.close:entry;
+  const cum=(entry&&lclose)?(lclose/entry-1)*100:null,live=st.status==='active';
+  const stTxt=live?'在池':(st.exit&&st.exit.revoked?'已撤回':'已退出');
+  const stCls=live?'badge live':(st.exit&&st.exit.revoked?'badge rev':'badge exit');
+  return `<div class="m-card">
+    <div class="m-top" onclick="mtoggle('${st.code}')">
+      <div class="m-l"><div><span class="m-name">${st.name}</span><span class="m-code num">${st.code}</span></div><div class="m-sub">${st.setup||''}${st.board?(' · '+st.board):''}</div></div>
+      <div class="m-r ${cls(lc)}"><b class="num">${fmt(lclose)}</b><div class="num ${cls(lc)}">${pct(lc)}</div></div>
+    </div>
+    <div class="m-mid">
+      <span class="${cls(cum)} num m-cum">入池后 ${pct(cum)}</span>
+      <span class="m-dim">入池 ${st.entry_date.slice(5)} · ${fmt(entry)}</span>
+      <span class="${stCls}">${stTxt}</span>
+    </div>
+    <div class="obs" style="margin-top:7px">${st.note||st.auto_note||'—'}${st.action?'　<span class="act '+(/已破|放量下跌|临界附近/.test(st.action)?'hot':'')+'">'+st.action+'</span>':''}</div>
+    <div class="m-act"><a class="link" href="${qx(st.code)}" target="_blank">行情 ↗</a><span class="m-more" onclick="mtoggle('${st.code}')">明细 ▾</span></div>
+    <div class="hidden" id="dm-${st.code}">${detailInner(st,ds,entry)}</div>
+  </div>`;
+}
+function mtoggle(c){$('dm-'+c).classList.toggle('hidden');}
 function tbl(list,empty){
   if(!list.length)return `<p class="note">${empty}</p>`;
   const th=(f,t)=>`<th class="sortable ${SORT.field===f?'active':''}" onclick="sortBy('${f}')">${t}<span class="ar">${SORT.field===f?(SORT.dir>0?'▲':'▼'):'⇅'}</span></th>`;
-  return `<table class="resp"><thead><tr><th>标的</th>${th('entry_date','入池日期')}<th>形态/板块</th>${th('entry_price','入池价')}${th('_latest','最新价')}${th('_chg','当日涨跌')}${th('_cum','入池后累计')}<th>观察备注</th><th>状态</th><th>行情</th></tr></thead><tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+  const desktop=`<table class="resp"><thead><tr><th>标的</th>${th('entry_date','入池日期')}<th>形态/板块</th>${th('entry_price','入池价')}${th('_latest','最新价')}${th('_chg','当日涨跌')}${th('_cum','入池后累计')}<th>观察备注</th><th>状态</th><th>行情</th></tr></thead><tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+  const mobile=`<div class="m-list">${list.map(mCard).join('')}</div>`;
+  return desktop+mobile;
 }
 function enrich(st){const ds=dailyOf(st.code),lt=ds.length?ds[ds.length-1]:null;st._latest=lt?lt.close:st.entry_price;st._chg=lt?lt.chg:null;st._cum=(st.entry_price&&st._latest)?(st._latest/st.entry_price-1)*100:null;return st;}
 function hasFilt(){return !!(FILT.kw||FILT.board||FILT.setup||FILT.date);}
