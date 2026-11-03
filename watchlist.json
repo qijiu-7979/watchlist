@@ -11,7 +11,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 10.3,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能79%｜距临界+12.9%",
+      "note_date": "2026-11-03",
+      "action": "观察"
     },
     {
       "code": "000513",
@@ -24,7 +28,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 29.42,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能81%｜距临界+8.7%",
+      "note_date": "2026-11-03",
+      "action": "观察"
     },
     {
       "code": "000716",
@@ -36,8 +44,17 @@
       "critical_price": 5.36,
       "entry_date": "2026-11-02",
       "entry_price": 5.49,
-      "status": "active",
-      "exit": null
+      "status": "exited",
+      "exit": {
+        "date": "2026-11-03",
+        "reason": "跌破战法临界值（三倍量：跌破爆量日最低价）",
+        "trigger": "收盘 5.15 < 临界 5.36",
+        "revoked": false
+      },
+      "note": "",
+      "auto_note": "已破临界-3.9%",
+      "note_date": "2026-11-03",
+      "action": "已破临界，按规则退出"
     },
     {
       "code": "600020",
@@ -50,7 +67,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 4.32,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能69%｜距临界+6.1%",
+      "note_date": "2026-11-03",
+      "action": "观察"
     },
     {
       "code": "603587",
@@ -63,7 +84,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 14.19,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能134%｜距临界+5.8%",
+      "note_date": "2026-11-03",
+      "action": "放量下跌，警惕出货，不买"
     },
     {
       "code": "600211",
@@ -76,7 +101,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 38.73,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能49%｜距临界+5.5%",
+      "note_date": "2026-11-03",
+      "action": "缩量回踩中，等二次放量再动"
     },
     {
       "code": "603014",
@@ -89,7 +118,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 32.11,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能77%｜距临界+4.7%",
+      "note_date": "2026-11-03",
+      "action": "观察"
     },
     {
       "code": "000897",
@@ -102,7 +135,11 @@
       "entry_date": "2026-11-02",
       "entry_price": 1.86,
       "status": "active",
-      "exit": null
+      "exit": null,
+      "note": "",
+      "auto_note": "量能84%｜距临界+4.3%",
+      "note_date": "2026-11-03",
+      "action": "观察"
     }
   ],
   "daily": [
@@ -111,14 +148,18 @@
       "code": "000513",
       "close": 29.42,
       "chg": 3.16,
-      "low": 28.4
+      "low": 28.4,
+      "vol": 16391800.0,
+      "high": 29.6
     },
     {
       "date": "2026-11-03",
       "code": "000513",
       "close": 29.96,
       "chg": 1.84,
-      "low": 29.21
+      "low": 29.21,
+      "vol": 13254700.0,
+      "high": 30.31
     },
     {
       "date": "2026-11-02",
@@ -139,84 +180,108 @@
       "code": "000897",
       "close": 1.86,
       "chg": 1.09,
-      "low": 1.84
+      "low": 1.84,
+      "vol": 126106100.0,
+      "high": 1.95
     },
     {
       "date": "2026-11-03",
       "code": "000897",
       "close": 1.92,
       "chg": 3.23,
-      "low": 1.83
+      "low": 1.83,
+      "vol": 105349500.0,
+      "high": 1.99
     },
     {
       "date": "2026-11-02",
       "code": "600020",
       "close": 4.32,
       "chg": 9.92,
-      "low": 4.09
+      "low": 4.09,
+      "vol": 96245500.0,
+      "high": 4.32
     },
     {
       "date": "2026-11-03",
       "code": "600020",
       "close": 4.34,
       "chg": 0.46,
-      "low": 4.25
+      "low": 4.25,
+      "vol": 66267200.0,
+      "high": 4.48
     },
     {
       "date": "2026-11-02",
       "code": "600211",
       "close": 38.73,
       "chg": 7.26,
-      "low": 37.0
+      "low": 37.0,
+      "vol": 12752800.0,
+      "high": 39.39
     },
     {
       "date": "2026-11-03",
       "code": "600211",
       "close": 39.03,
       "chg": 0.77,
-      "low": 38.26
+      "low": 38.26,
+      "vol": 6248800.0,
+      "high": 39.18
     },
     {
       "date": "2026-11-02",
       "code": "600380",
       "close": 10.3,
       "chg": 2.49,
-      "low": 10.01
+      "low": 10.01,
+      "vol": 22688900.0,
+      "high": 10.32
     },
     {
       "date": "2026-11-03",
       "code": "600380",
       "close": 10.3,
       "chg": 0.0,
-      "low": 10.2
+      "low": 10.2,
+      "vol": 17948400.0,
+      "high": 10.38
     },
     {
       "date": "2026-11-02",
       "code": "603014",
       "close": 32.11,
       "chg": 8.41,
-      "low": 31.17
+      "low": 31.17,
+      "vol": 5545300.0,
+      "high": 32.3
     },
     {
       "date": "2026-11-03",
       "code": "603014",
       "close": 32.64,
       "chg": 1.65,
-      "low": 31.76
+      "low": 31.76,
+      "vol": 4283500.0,
+      "high": 32.76
     },
     {
       "date": "2026-11-02",
       "code": "603587",
       "close": 14.19,
       "chg": 10.0,
-      "low": 13.14
+      "low": 13.14,
+      "vol": 18477300.0,
+      "high": 14.19
     },
     {
       "date": "2026-11-03",
       "code": "603587",
       "close": 13.9,
       "chg": -2.04,
-      "low": 13.36
+      "low": 13.36,
+      "vol": 24833600.0,
+      "high": 14.41
     }
   ],
   "events": [
@@ -275,6 +340,14 @@
       "name": "津滨发展",
       "type": "entry",
       "note": "三倍量(爆量) 入池"
+    },
+    {
+      "date": "2026-11-03",
+      "code": "000716",
+      "name": "黑芝麻",
+      "type": "exit",
+      "reason": "跌破战法临界值",
+      "trigger": "收盘 5.15 < 临界 5.36"
     }
   ],
   "updated": "2026-11-03"
