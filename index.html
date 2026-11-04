@@ -45,6 +45,13 @@ tbody tr.main.open td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .s-chip{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:6px;background:#f8fafc;border:1px solid var(--line);font-size:11.5px;white-space:nowrap}
 .s-chip a{color:#2563eb;text-decoration:none;font-weight:500}.s-chip em{font-style:normal;font-size:9.5px;color:#fff;background:#b91c1c;border-radius:3px;padding:0 3px;margin-left:4px}
 .s-chip.st{border-color:#fecaca;background:#fef2f2}
+.snap-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:2px 20px 16px}
+.snap-col-title{font-size:11px;color:#94a3b8;font-weight:600;margin:8px 0 6px}
+.snap-table{width:100%;border-collapse:collapse;font-size:12px}
+.snap-table th{background:#fafbfd;color:#64748b;font-size:11px;font-weight:600;text-align:left;padding:6px 10px;border-bottom:1px solid #e5e7eb}
+.snap-table td{padding:6px 10px;border-bottom:1px solid #f1f4f8;vertical-align:middle}
+.snap-table .cell-sub{font-size:10.5px}
+@media(max-width:860px){.snap-grid{grid-template-columns:1fr}}
 .hidden{display:none!important}
 .filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;padding:14px 16px;margin-bottom:10px}
 .f-item{display:flex;flex-direction:column;gap:4px}.f-item label{font-size:11px;color:var(--muted)}
@@ -222,7 +229,7 @@ function renderSectors(){
   const chip=list=>{if(!list||!list.length)return '<span class="obs">—</span>';return list.map(s=>`<span class="s-chip${s.st?' st':''}"><a href="${qx(s.code)}" target="_blank">${s.name}</a> <span class="${cls(s.chg)} num">${pct(s.chg)}</span>${s.st?'<em>ST</em>':''}</span>`).join('');};
   const leadRow=x=>`<tr><td><span class="badge">${x.name}</span></td><td class="${cls(x.chg)} num">${pct(x.chg)}</td><td>${x.leader?`<a href="${qx(x.leader_code)}" target="_blank">${x.leader}</a> <span class="cell-sub num">${x.leader_code} · ${pct(x.leader_chg)} · ${x.leader_board}</span>`:'—'}</td></tr>`;
   let h='';
-  if(inds.length||cons.length){h+=`<div class="card" style="margin-bottom:14px"><div style="padding:14px 20px;font-weight:700;color:var(--ink)">🔥 领涨板块 <span class="obs">（行业 / 概念 · 领涨股多为创业板科创板，仅示板块强弱）</span></div><div class="tbl-scroll"><table><thead><tr><th>板块</th><th>涨跌幅</th><th>领涨股</th></tr></thead><tbody>${inds.map(leadRow).join('')}${cons.map(leadRow).join('')}</tbody></table></div></div>`;}
+  if(inds.length||cons.length){const colTbl=(list,title)=>`<div><div class="snap-col-title">${title}</div><table class="snap-table"><thead><tr><th>板块</th><th>涨跌幅</th><th>领涨股</th></tr></thead><tbody>${list.map(leadRow).join('')}</tbody></table></div>`;h+=`<div class="card" style="margin-bottom:14px"><div style="padding:12px 20px 2px;font-weight:700;color:var(--ink)">🔥 领涨板块 <span class="obs">（领涨股多为创业板科创板，仅示板块强弱）</span></div><div class="snap-grid">${colTbl(inds,'行业')}${colTbl(cons,'概念')}</div></div>`;}
   if(lags.length){h+=`<div class="card" style="margin-bottom:14px"><div style="padding:14px 20px;font-weight:700;color:var(--ink)">🧊 领跌板块 <span class="obs">（申万一级）</span></div><div style="display:flex;gap:10px;flex-wrap:wrap;padding:4px 20px 16px">${lags.map(x=>`<span class="badge" style="background:var(--down-bg);color:var(--down);border-color:#bbf7d0">${x.name} <b class="${cls(x.chg)} num">${pct(x.chg)}</b></span>`).join('')}</div></div>`;}
   if(secs.length){h+=`<div class="card"><div style="padding:14px 20px;font-weight:700;color:var(--ink)">📈 板块内主板标的 <span class="obs">（领涨板块看领涨 · 领跌板块看领跌 · 仅沪深主板）</span></div><div class="tbl-scroll"><table><thead><tr><th>板块</th><th>板块涨跌</th><th>领涨标的</th><th>领跌标的</th></tr></thead><tbody>${secs.map(x=>`<tr><td><span class="badge">${x.name}</span></td><td class="${cls(x.chg)} num">${pct(x.chg)}</td><td>${chip(x.up)}</td><td>${chip(x.down)}</td></tr>`).join('')}</tbody></table></div></div>`;}
   el.innerHTML=h;
